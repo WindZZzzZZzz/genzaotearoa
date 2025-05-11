@@ -1,7 +1,49 @@
-<div id="data-container" style="display: flex; gap: 40px; background-color:beige; height: 100vh;">
-    <div id="filter" style="width: 80%; max-width: 600px; overflow-y: auto; height: 100%; background-color: #FF94AB;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fund Data Display</title>
+  <style>
+    /* Prevent vertical and horizontal scrolling on the entire page */
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;  /* Disable scrollbars for the entire page */
+      height: 100%;  /* Ensure body takes full height */
+    }
+
+    #data-container {
+      display: flex;
+      gap: 40px;
+      background-color: beige;
+      height: 100vh;
+      overflow: hidden;  /* Disable scrolling on the data container */
+    }
+
+    /* Ensure the filter section is scrollable but doesn't push the page */
+    #filter {
+      width: 80%;
+      max-width: 600px;
+      overflow-y: auto;
+      height: 100%;
+      background-color: #FF94AB;
+    }
+
+    /* Enable scrolling for the data-list section */
+    #data-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;  /* Enable vertical scrolling */
+      max-height: 100vh;  /* Limit the height to the viewport */
+    }
+  </style>
+</head>
+<body>
+	<div id="data-container">
+    <div id="filter">
       <div id="filter-container" style="display: flex; flex-direction: column; gap: 15px; padding: 20%;">
-  
         <!-- Keyword -->
         <label style="display: flex; gap: 10px;">
           <strong>Keyword:</strong>
@@ -44,7 +86,7 @@
       </div>
     </div>
   
-    <div id="data-list" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+    <div id="data-list">
           <div id="pagination" style="margin-top: 20px; margin-bottom: 30px; border-bottom: 1px solid#000; padding-bottom: 16px; width: calc(100% - 50px)"></div>
       <div id="card-container" style="display: flex; flex-direction: column; gap: 20px;"></div>
     </div>
@@ -152,38 +194,38 @@
   
       currentItems.forEach(item => {
         const card = document.createElement('div');
-              card.style.borderBottom = '1px solid #000';
-              card.style.padding = '20px 30px 40px 15px'; // top, right, bottom, left
-              card.style.width = 'calc(100% - 50px)';
-              card.style.boxSizing = 'border-box'; // ensures padding is included
+        card.style.borderBottom = '1px solid #000';
+        card.style.padding = '20px 30px 40px 15px'; // top, right, bottom, left
+        card.style.width = 'calc(100% - 50px)';
+        card.style.boxSizing = 'border-box'; // ensures padding is included
         
-              let infoButton = undefined;
-              for (const key in item) {
+        let infoButton = undefined;
+        for (const key in item) {
           const line = document.createElement('div');
-                  if (key === 'Fund Name') {
-                      line.style.fontSize = '26px';
-                      line.style.fontWeight = 'bold';
-                      line.style.color = '#306844'
-                      line.innerHTML = `<strong>${item[key]}`;
-                      line.style.marginBottom = '10px';
-                  } else if (key === 'Information') {
-                      line.style.fontSize = '18px';
-                      line.innerHTML = `<a href="${item[key]}" target="_blank" style="text-decoration: none;">
-                                <button style="padding: 10px 20px; background-color: #000000; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                                  More Infomation
-                                </button>
-                              </a>`;
-                      line.style.marginBottom = '6px';
-                      infoButton = line;
-                      continue;
-                  } else {
-                      line.style.fontSize = '18px';
-                      line.innerHTML = `<strong>${key}:</strong> ${item[key]}`;
-                      line.style.marginBottom = '6px';
-                  }
+          if (key === 'Fund Name') {
+            line.style.fontSize = '26px';
+            line.style.fontWeight = 'bold';
+            line.style.color = '#306844'
+            line.innerHTML = `<strong>${item[key]}`;
+            line.style.marginBottom = '10px';
+          } else if (key === 'Information') {
+            line.style.fontSize = '18px';
+            line.innerHTML = `<a href="${item[key]}" target="_blank" style="text-decoration: none;">
+                                  <button style="padding: 10px 20px; background-color: #000000; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                    More Infomation
+                                  </button>
+                                </a>`;
+            line.style.marginBottom = '6px';
+            infoButton = line;
+            continue;
+          } else {
+            line.style.fontSize = '18px';
+            line.innerHTML = `<strong>${key}:</strong> ${item[key]}`;
+            line.style.marginBottom = '6px';
+          }
           card.appendChild(line);
         }
-              card.appendChild(infoButton);
+        card.appendChild(infoButton);
   
         container.appendChild(card);
       });
@@ -219,4 +261,5 @@
       el.style.display = (el.style.display === 'none') ? 'block' : 'none';
     }
   </script>
-  
+</body>
+</html>
