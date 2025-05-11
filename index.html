@@ -23,11 +23,11 @@
 
     /* Ensure the filter section is scrollable but doesn't push the page */
     #filter {
-      width: 80%;
+      width: 100%;
       max-width: 600px;
       overflow-y: auto;
       height: 100%;
-      background-color: #FF94AB;
+      background-color: #D0312D;
     }
 
     /* Enable scrolling for the data-list section */
@@ -38,6 +38,44 @@
       overflow-y: auto;  /* Enable vertical scrolling */
       max-height: 100vh;  /* Limit the height to the viewport */
     }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+      color: whitesmoke;
+    }
+
+    .multiselect {
+      position: absolute;
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      color: #000;
+      margin-top: 5px;
+      padding: 10px;
+      height: 150px;
+      overflow-y: auto;
+    }
+
+		@media (max-width: 768px) {
+			#data-container {
+				flex-direction: column;
+				height: auto; /* allow vertical scrolling */
+			}
+
+			#filter {
+				width: 100%;
+				max-width: none;
+				height: auto;
+			}
+
+			#data-list {
+				flex: none;
+				height: auto;
+			}
+		}
   </style>
 </head>
 <body>
@@ -45,26 +83,26 @@
     <div id="filter">
       <div id="filter-container" style="display: flex; flex-direction: column; gap: 15px; padding: 20%;">
         <!-- Keyword -->
-        <label style="display: flex; gap: 10px;">
+        <label style="display: flex; gap: 10px;" class="filter-option">
           <strong>Keyword:</strong>
-          <input type="text" id="filter-keyword" placeholder="Search..." style="padding: 5px; width: 260px; margin-left: auto;">
+          <input type="text" id="filter-keyword" placeholder="Search..." style="padding: 5px; width: 247px; margin-left: auto;">
         </label>
   
         <!-- Region -->
-        <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+        <div style="display: flex; gap: 10px;" class="filter-option">
           <strong>Region:</strong>
           <div id="select-region" style="width: 260px; margin-left: auto;">
             <button type="button" onclick="toggleDropdown('region-options')" style="width: 100%; text-align: left; padding: 8px; background-color: #f5f5f5; border: 1px solid #ccc; cursor: pointer;">
               ▼ Region
             </button>
-            <div id="region-options" style="display: none; margin-top: 5px;">
+            <div id="region-options" class="multiselect" style="display: none;">
               <div id="filter-region"></div>
             </div>
           </div>
         </div>
   
         <!-- Age -->
-        <label style="display: flex; gap: 10px;">
+        <label style="display: flex; gap: 10px;" class="filter-option">
           <strong>Age:</strong>
           <select id="filter-age" style="padding: 5px; width: 260px; margin-left: auto;">
             <option value="">All</option>
@@ -72,13 +110,13 @@
         </label>
   
         <!-- Type -->
-        <div style="display: flex; gap: 10px; width: 100%; max-width: 600px;">
+        <div style="display: flex; gap: 10px; width: 100%; max-width: 600px;" class="filter-option">
           <strong>Type:</strong>
           <div id="select-type" style="width: 260px; margin-left: auto;">
             <button type="button" onclick="toggleDropdown('type-options')" style="width: 100%; text-align: left; padding: 8px; background-color: #f5f5f5; border: 1px solid #ccc; cursor: pointer;">
               ▼ Type
             </button>
-            <div id="type-options" style="display: none; margin-top: 5px;">
+            <div id="type-options" class="multiselect" style="display: none;">
               <div id="filter-type"></div>
             </div>
           </div>
@@ -87,7 +125,7 @@
     </div>
   
     <div id="data-list">
-          <div id="pagination" style="margin-top: 20px; margin-bottom: 30px; border-bottom: 1px solid#000; padding-bottom: 16px; width: calc(100% - 50px)"></div>
+      <div id="pagination" style="margin-top: 20px; margin-bottom: 30px; border-bottom: 1px solid#000; padding-bottom: 16px; width: calc(100% - 50px)"></div>
       <div id="card-container" style="display: flex; flex-direction: column; gap: 20px;"></div>
     </div>
   </div>
@@ -117,13 +155,16 @@
             renderCards(currentPage);
             renderPagination();
             setupFilterListeners();
+            closeDropdowns();
           }
         });
       });
   
     function extractFilterOptions(data) {
       data.forEach(row => {
-        if (row["Region"]) regionSet.add(row["Region"]);
+        if (row["Region"]) {
+					row["Region"].split(',').map(t => t.trim()).forEach(t => regionSet.add(t));
+				}
         if (row["Age Eligibility"]) ageSet.add(row["Age Eligibility"]);
         if (row["Type of Funding"]) {
           row["Type of Funding"].split(',').map(t => t.trim()).forEach(t => typeSet.add(t));
@@ -171,7 +212,7 @@
   
       filteredData = cardData.filter(item => {
         const keywordMatch = keyword === '' || Object.values(item).some(val => String(val).toLowerCase().includes(keyword));
-        const regionMatch = selectedRegions.length === 0 || selectedRegions.includes(item["Region"]);
+        const regionMatch = selectedRegions.length === 0 || selectedRegions.some(t => item["Region"].includes(t));
         const ageMatch = selectedAge === '' || item["Age Eligibility"] === selectedAge;
         const itemTypes = item["Type of Funding"] ? item["Type of Funding"].split(',').map(t => t.trim()) : [];
         const typeMatch = selectedTypes.length === 0 || selectedTypes.some(t => itemTypes.includes(t));
@@ -258,8 +299,24 @@
   
     function toggleDropdown(id) {
       const el = document.getElementById(id);
-      el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+      const currentDisplay = window.getComputedStyle(el).display;
+      el.style.display = (currentDisplay === 'none') ? 'block' : 'none';
     }
+
+    function closeDropdowns() {
+      document.addEventListener('click', function(event) {
+      // Check if the click happened inside a dropdown or its toggle button
+      const isClickInsideDropdown = event.target.closest('.multiselect') ||
+                                  event.target.closest('button[onclick^="toggleDropdown"]');
+    
+      if (!isClickInsideDropdown) {
+        document.querySelectorAll('.multiselect').forEach(dropdown => {
+          dropdown.style.display = 'none';
+        });
+      }
+      });
+    }
+
   </script>
 </body>
 </html>
