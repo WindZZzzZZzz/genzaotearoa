@@ -146,10 +146,8 @@
     let ageSet = new Set();
     let typeSet = new Set();
 
-    const csv_path = '../data/fund_info.csv';
+    const csv_path = 'data/fund_info.csv';
     const csvUrl = new URL(csv_path, window.location.href).href;
-
-    console.log(csvUrl);
 
     fetch(csvUrl)
       .then(response => response.text())
