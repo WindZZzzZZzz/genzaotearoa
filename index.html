@@ -136,7 +136,7 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTz6qYaiQ-12wssmuuEKG2ehDx_jIFgD8FVqSa0IQCqpGtFVRxajoijuJ1vezpOlAm56YLsjwhN5_m/pub?output=csv';
+    // const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTz6qYaiQ-12wssmuuEKG2ehDx_jIFgD8FVqSa0IQCqpGtFVRxajoijuJ1vezpOlAm56YLsjwhN5_m/pub?output=csv';
     const rowsPerPage = 5;
     let currentPage = 1;
     let cardData = [];
@@ -145,24 +145,42 @@
     let regionSet = new Set();
     let ageSet = new Set();
     let typeSet = new Set();
+
+    const csv_path = '../data/fund_info.csv';
+    const csvUrl = new URL(csv_path, window.location.href).href;
+    
+    Papa.parse(csv_path, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        cardData = results.data;
+        filteredData = cardData;
+        extractFilterOptions(cardData);
+        renderCards(currentPage);
+        renderPagination();
+        setupFilterListeners();
+        closeDropdowns();
+      }
+    })
   
-    fetch(csvUrl)
-      .then(response => response.text())
-      .then(csv => {
-        Papa.parse(csv, {
-          header: true,
-          skipEmptyLines: true,
-          complete: function(results) {
-            cardData = results.data;
-            filteredData = cardData;
-            extractFilterOptions(cardData);
-            renderCards(currentPage);
-            renderPagination();
-            setupFilterListeners();
-            closeDropdowns();
-          }
-        });
-      });
+    // fetch(csvUrl)
+    //   .then(response => response.text())
+    //   .then(csv => {
+    //     Papa.parse(csv, {
+    //       header: true,
+    //       skipEmptyLines: true,
+    //       complete: function(results) {
+    //         cardData = results.data;
+    //         filteredData = cardData;
+    //         extractFilterOptions(cardData);
+    //         renderCards(currentPage);
+    //         renderPagination();
+    //         setupFilterListeners();
+    //         closeDropdowns();
+    //       }
+    //     });
+    //   });
   
     function extractFilterOptions(data) {
       data.forEach(row => {
