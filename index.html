@@ -148,39 +148,24 @@
 
     const csv_path = '../data/fund_info.csv';
     const csvUrl = new URL(csv_path, window.location.href).href;
-    
-    Papa.parse(csv_path, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: function(results) {
-        cardData = results.data;
-        filteredData = cardData;
-        extractFilterOptions(cardData);
-        renderCards(currentPage);
-        renderPagination();
-        setupFilterListeners();
-        closeDropdowns();
-      }
-    })
-  
-    // fetch(csvUrl)
-    //   .then(response => response.text())
-    //   .then(csv => {
-    //     Papa.parse(csv, {
-    //       header: true,
-    //       skipEmptyLines: true,
-    //       complete: function(results) {
-    //         cardData = results.data;
-    //         filteredData = cardData;
-    //         extractFilterOptions(cardData);
-    //         renderCards(currentPage);
-    //         renderPagination();
-    //         setupFilterListeners();
-    //         closeDropdowns();
-    //       }
-    //     });
-    //   });
+
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(csv => {
+        Papa.parse(csv, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            cardData = results.data;
+            filteredData = cardData;
+            extractFilterOptions(cardData);
+            renderCards(currentPage);
+            renderPagination();
+            setupFilterListeners();
+            closeDropdowns();
+          }
+        });
+      });
   
     function extractFilterOptions(data) {
       data.forEach(row => {
