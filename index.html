@@ -149,6 +149,8 @@
     const csv_path = '../data/fund_info.csv';
     const csvUrl = new URL(csv_path, window.location.href).href;
 
+    console.log(csvUrl);
+
     fetch(csvUrl)
       .then(response => response.text())
       .then(csv => {
